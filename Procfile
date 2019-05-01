@@ -1,0 +1,1 @@
+bot: magic_battle.py
