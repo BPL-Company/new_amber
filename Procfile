@@ -1,1 +1,1 @@
-bot: magic_battle.py
+bot: python3 magic_battle.py
