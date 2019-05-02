@@ -38,9 +38,11 @@ class Mag:
         return results
 
     def cast_spell(self, spell_text):
+        is_preset = False
         if spell_text in self.presets:
             self.presets.remove(spell_text)
-        return compute_spell(spell_text, from_mag=self, to_mag=None)
+            is_preset = True
+        return compute_spell(spell_text, from_mag=self, to_mag=None, is_preset=is_preset)
 
     def heals(self, spell):
         results = {'heal': 0, 'effects': [], 'to_mag': self, 'from_mag': spell.from_mag}

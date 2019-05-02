@@ -200,6 +200,9 @@ def results_to_text(results):
             else:
                 text += '{} выхилил {} на {}♥️!\n'.format(ress['from_mag'].name, ress['to_mag'].name, ress['heal'])
             continue
+        if 'success' in ress and not ress['success']:
+            text += 'У мага {} не получилось наколдовать свое заклинание!\n'.format(ress['mag'].name)
+            continue
         damage = ress['damage']
         effects = ress['effects']
         this_text = ''

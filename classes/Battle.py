@@ -27,18 +27,27 @@ class Battle:
         spell = this_mag.cast_spell(spell)
         results = []
         mags = []
-        if spell.area == 'AOE':
-            for player in self.mags.values():
-                mags.append(player)
-        else:
-            if spell.type == 'heal':
+        if not spell.is_success:
+            results.append({'success': False, 'mag': this_mag})
+            if spell.type == 'damage':
                 mags.append(this_mag)
-            else:
-                while True:
-                    player = random.choice(list(self.mags.values()))
+            if spell.type == 'heal':
+                for player in self.mags.values():
                     if player.id != this_mag.id:
                         mags.append(player)
-                        break
+        else:
+            if spell.area == 'AOE':
+                for player in self.mags.values():
+                    mags.append(player)
+            else:
+                if spell.type == 'heal':
+                    mags.append(this_mag)
+                else:
+                    while True:
+                        player = random.choice(list(self.mags.values()))
+                        if player.id != this_mag.id:
+                            mags.append(player)
+                            break
         res = spell.cast(mags)
         results += res
         results.append(this_mag.next_turn())
