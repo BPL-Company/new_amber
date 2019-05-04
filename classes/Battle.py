@@ -1,4 +1,5 @@
 from classes.Mag import Mag
+from classes.TurnResult import TurnResult
 import random
 
 
@@ -28,7 +29,7 @@ class Battle:
         results = []
         mags = []
         if not spell.is_success:
-            results.append({'success': False, 'mag': this_mag})
+            results.append({'success': False, 'to_mag': this_mag})
             if spell.type == 'damage':
                 mags.append(this_mag)
             if spell.type == 'heal':
@@ -36,6 +37,7 @@ class Battle:
                     if player.id != this_mag.id:
                         mags.append(player)
         else:
+            results.append({'success': True, 'to_mag': this_mag})
             if spell.area == 'AOE':
                 for player in self.mags.values():
                     mags.append(player)
@@ -56,7 +58,6 @@ class Battle:
             if mag.hp <= 0:
                 results.append({'dead': mag, 'from': mag.last_damage})
                 pops.append(mag.id)
-                print(mag.id)
                 self.order.remove(mag.id)
         for mag in pops:
             self.mags.pop(mag)
@@ -65,8 +66,8 @@ class Battle:
             self.now_mag = 0
         if len(self.mags) == 1:
             results.append({'win': self.mags.popitem()[1]})
-            return results, False
+            return TurnResult(results), False
         if len(self.mags) == 0:
             results.append({'draw': True})
-            return results, False
-        return results, self.mags[self.order[self.now_mag]]
+            return TurnResult(results), False
+        return TurnResult(results), self.mags[self.order[self.now_mag]]

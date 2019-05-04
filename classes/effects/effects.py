@@ -9,7 +9,7 @@ class Cold(Effect):
 
     def do(self):
         if self.count_turns_to_end == 1:
-            return {'end_cold': self.mag.name}
+            return {'end_cold': self.mag}
         self.count_turns_to_end -= 1
         return {}
 
@@ -29,7 +29,7 @@ class Fire(Effect):
 
     def do(self):
         if self.count_turns_to_end == 1:
-            return {'end_fire': self.mag.name}
+            return {'end_fire': self.mag}
         self.mag.hp -= self.power
         self.count_turns_to_end -= 1
         self.mag.last_damage = self.from_mag

@@ -16,15 +16,17 @@ class Mag:
         self.last_damage = None
 
     def deal_damage(self, spell):
-        results = {'damage': 0, 'effects': [], 'to_mag': self, 'from_mag': spell.from_mag}
+        results = {'damage': {'cold': 0, 'stone': 0, 'fire': 0}, 'effects': [], 'to_mag': self, 'from_mag': spell.from_mag}
+        results['damage']['stone'] = spell.damage
         if 'cold' in spell.with_effects:
             if 'cold' in self.effects:
-                spell.damage += self.effects['cold'].power
                 results['effects'].append({'add_term_cold': self.effects['cold']})
                 self.effects['cold'].add_term()
             else:
                 self.effects['cold'] = Cold(spell.from_mag, self)
                 results['effects'].append({'add_cold': self.effects['cold']})
+            results['damage']['cold'] += self.effects['cold'].power
+            results['damage']['stone'] -= 1
         if 'fire' in spell.with_effects:
             if 'fire' in self.effects:
                 results['effects'].append({'add_term_fire': self.effects['fire']})
@@ -32,7 +34,6 @@ class Mag:
             else:
                 self.effects['fire'] = Fire(spell.from_mag, self)
                 results['effects'].append({'add_fire': self.effects['fire']})
-        results['damage'] = spell.damage
         self.hp -= spell.damage
         self.last_damage = spell.from_mag
         return results
@@ -51,12 +52,14 @@ class Mag:
         return results
 
     def next_turn(self):
-        results = {'damage': 0, 'effects': [], 'to_mag': self.id}
+        results = {'damage': {'fire': 0}, 'effects': [], 'to_mag': self}
         ef_end_do = []
         for effect in self.effects:
             res = self.effects[effect].do()
             if 'end_cold' in res:
                 ef_end_do.append(effect)
+            if 'fair_do' in res:
+                results['damage']['fire'] += res['fire_do'].power
             results['effects'].append(res)
         for effect in ef_end_do:
             self.effects[effect].end_do()

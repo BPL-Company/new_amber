@@ -175,7 +175,7 @@ def hndl(m):
                 if next_mag:
                     text += 'Следующий игрок: ' + next_mag.name
                 res_text, is_end = results_to_text(res)
-                bot.send_message(m.chat.id, res_text)
+                bot.send_message(m.chat.id, res_text, parse_mode='Markdown')
                 if is_end:
                     battles.pop(m.chat.id)
                 else:
@@ -183,59 +183,10 @@ def hndl(m):
 
 
 def results_to_text(results):
-    text = ''
-    for ress in results:
-        if 'dead' in ress:
-            text += '{} умер от {}!\n'.format(ress['dead'].name, ress['from'].name)
-            continue
-        if 'win' in ress:
-            text += '{} победил!'.format(ress['win'].name)
-            return text, True
-        if 'draw' in ress:
-            text += 'Ничья!'
-            return text, True
-        if 'heal' in ress:
-            if ress['from_mag'] is ress['to_mag']:
-                text += '{} выхилился на {}♥️!\n'.format(ress['from_mag'].name, ress['heal'])
-            else:
-                text += '{} выхилил {} на {}♥️!\n'.format(ress['from_mag'].name, ress['to_mag'].name, ress['heal'])
-            continue
-        if 'success' in ress and not ress['success']:
-            text += 'У мага {} не получилось наколдовать свое заклинание!\n'.format(ress['mag'].name)
-            continue
-        damage = ress['damage']
-        effects = ress['effects']
-        this_text = ''
-        for effect in effects:
-            if 'add_cold' in effect:
-                cold = effect['add_cold']
-                this_text += '{} заморозил {} на {} ходов и нанес {} урона!\n'\
-                    .format(cold.from_mag.name, cold.mag.name, cold.count_turns_to_end, damage)
-            if 'add_term_cold' in effect:
-                cold = effect['add_term_cold']
-                this_text += '{} продлил заморозку {} на {} ходов и нанес {} урона!\n'\
-                    .format(cold.from_mag.name, cold.mag.name, cold.power-1, damage)
-            if 'end_cold' in effect:
-                this_text += 'Закончилась заморозка на {}\n'.format(effect['end_cold'])
-            if 'add_fire' in effect:
-                fire = effect['add_fire']
-                this_text += '{} поджег {} на {} ходов!\n'\
-                    .format(fire.from_mag.name, fire.mag.name, fire.count_turns_to_end)
-            if 'add_term_fire' in effect:
-                fire = effect['add_term_fire']
-                this_text += '{} продлил поджигание {} на {} ходов!\n'\
-                    .format(fire.from_mag.name, fire.mag.name, fire.power-1)
-            if 'end_fire' in effect:
-                this_text += 'Закончился огонь на {}\n'.format(effect['end_fire'])
-            if 'fire_do' in effect:
-                fire = effect['fire_do']
-                this_text += 'Огонь нанес {} {} урона!\n'.format(fire.mag.name, fire.power)
-        if this_text == '' and damage != 0:
-            this_text = '{} нанес {} урона магу {}!\n'.format(ress['from_mag'].name, damage, ress['to_mag'].name)
-        text += this_text
+    text = results.to_rus()
     if text == '':
         text = 'За этот ход не произошло ничего интересного.'
-    return text, False
+    return text, bool(results.who_win or results.is_draw)
 
 
 def new_player(player_id):
